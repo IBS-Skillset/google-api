@@ -9,7 +9,7 @@ public class PlaceIdMapperService {
 
     public PlaceResponse map(PlaceIdResponse placeIdResponse) {
         PlaceResponse response = new PlaceResponse();
-        response.setLattitude(placeIdResponse.getResult().getGeometry().getLocation().getLat());
+        response.setLatitude(placeIdResponse.getResult().getGeometry().getLocation().getLat());
         response.setLongitude(placeIdResponse.getResult().getGeometry().getLocation().getLng());
 
         return response;

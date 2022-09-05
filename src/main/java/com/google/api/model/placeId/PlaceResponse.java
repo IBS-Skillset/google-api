@@ -11,7 +11,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlaceResponse {
 
-    private String lattitude;
+    private String latitude;
     private String longitude;
 
 }
