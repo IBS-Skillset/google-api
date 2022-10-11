@@ -12,6 +12,7 @@ import com.google.api.service.CacheService;
 import com.google.api.service.PlaceApiService;
 import io.quarkus.logging.Log;
 import org.apache.commons.text.WordUtils;
+import io.quarkus.vault.VaultKVSecretEngine;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
 import java.util.Objects;
+import java.util.Map;
 
 import static com.google.api.util.APIConstants.*;
 
@@ -40,13 +42,16 @@ public class GoogleAPiController {
     PlaceIdMapperService placeIdMapperService;
     @Inject
     CacheService cacheService;
+    @Inject
+    VaultKVSecretEngine kvSecretEngine;
 
 
     @GetMapping("/autoComplete/")
     public AutoCompleteResponse autoComplete(@RequestParam String input) throws JsonProcessingException {
+        Map<String, String> vaultSecretMap = kvSecretEngine.readSecret("google-api" + "/config");
         AutoCompleteResponse response = cacheService.autoCompleteResponseFromCache(WordUtils.capitalize(input));
         if (Objects.isNull(response)) {
-            AutoCompletionResponse autoCompletionResponse = autocompleteService.getAutoComplete(TOKEN, input, LANGUAGE, RADIUS, SENSOR, KEY);
+            AutoCompletionResponse autoCompletionResponse = autocompleteService.getAutoComplete(vaultSecretMap.get("token"), input, LANGUAGE, RADIUS, SENSOR, vaultSecretMap.get("key"));
             response = autoCompleteMapperService.map(autoCompletionResponse);
             cacheService.cacheAutoCompleteResponse(response);
             Log.info("Google API response for autocomplete" + autoCompletionResponse);
