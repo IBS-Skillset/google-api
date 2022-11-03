@@ -10,9 +10,10 @@ import com.google.api.model.placeId.PlaceResponse;
 import com.google.api.service.AutocompleteService;
 import com.google.api.service.CacheService;
 import com.google.api.service.PlaceApiService;
+import com.google.api.service.VaultService;
 import io.quarkus.logging.Log;
-import org.apache.commons.text.WordUtils;
 import io.quarkus.vault.VaultKVSecretEngine;
+import org.apache.commons.text.WordUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import java.util.Objects;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.google.api.util.APIConstants.*;
-
 
 @RestController
 @RequestMapping("/googleApi")
@@ -48,10 +49,15 @@ public class GoogleAPiController {
 
     @GetMapping("/autoComplete/")
     public AutoCompleteResponse autoComplete(@RequestParam String input) throws JsonProcessingException {
-        Map<String, String> vaultSecretMap = kvSecretEngine.readSecret("google-api" + "/config");
+        VaultService vaultService = VaultService.INSTANCE.getInstance();
+        if(null==vaultService.getKey() || null==vaultService.getToken()) {
+            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret("google-api" + "/config");
+            vaultService.setToken(vaultSecretMap.get("token"));
+            vaultService.setKey(vaultSecretMap.get("key"));
+        }
         AutoCompleteResponse response = cacheService.autoCompleteResponseFromCache(WordUtils.capitalize(input));
         if (Objects.isNull(response)) {
-            AutoCompletionResponse autoCompletionResponse = autocompleteService.getAutoComplete(vaultSecretMap.get("token"), input, LANGUAGE, RADIUS, SENSOR, vaultSecretMap.get("key"));
+            AutoCompletionResponse autoCompletionResponse = autocompleteService.getAutoComplete(vaultService.getToken(), input, LANGUAGE, RADIUS, SENSOR, vaultService.getKey());
             response = autoCompleteMapperService.map(autoCompletionResponse);
             cacheService.cacheAutoCompleteResponse(response);
             Log.info("Google API response for autocomplete" + autoCompletionResponse);

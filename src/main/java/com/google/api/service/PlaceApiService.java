@@ -19,13 +19,20 @@ public class PlaceApiService {
     @Inject
     VaultKVSecretEngine kvSecretEngine;
 
+
+
     public PlaceIdResponse getLatitudeLongitude(String placeId) {
+        VaultService vaultService = VaultService.INSTANCE.getInstance();
+        if(null==vaultService.getKey()) {
+            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret("google-api" + "/config");
+            vaultService.setKey(vaultSecretMap.get("key"));
+        }
         Map<String, String> vaultSecretMap = kvSecretEngine.readSecret("google-api" + "/config");
         ResteasyClient resteasyClient = (ResteasyClient) ClientBuilder.newClient();
         ResteasyWebTarget target = resteasyClient.target("https://maps.googleapis.com/maps/api/place/details/json");
         target = target.queryParam("placeid", placeId).queryParam("language", APIConstants.LANGUAGE).
                 queryParam("sensor", APIConstants.SENSOR).
-                queryParam("key", vaultSecretMap.get("key"));
+                queryParam("key", vaultService.getKey());
         PlaceIdResponse response = target.request().get(PlaceIdResponse.class);
         Log.info(target.getUri());
         Log.info(response);
