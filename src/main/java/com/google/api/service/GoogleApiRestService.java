@@ -14,18 +14,18 @@ import javax.ws.rs.QueryParam;
 public interface GoogleApiRestService {
     @GET
     @Path(Constants.GOOGLE_API_AUTOCOMPLETE_URL)
-    AutoCompletionResponse getPlaceAutoComplete(@HeaderParam("Authorization") String token,
-                                                @QueryParam("input") String input,
-                                                @QueryParam("language") String language,
-                                                @QueryParam("radius") String radius,
-                                                @QueryParam("sensor") String sensor,
-                                                @QueryParam("key") String key);
+    AutoCompletionResponse getPlaceAutoComplete(@HeaderParam(Constants.AUTHORIZATION) String token,
+                                                @QueryParam(Constants.INPUT) String input,
+                                                @QueryParam(Constants.HEADER_LANGUAGE) String language,
+                                                @QueryParam(Constants.HEADER_RADIUS) String radius,
+                                                @QueryParam(Constants.HEADER_SENSOR) String sensor,
+                                                @QueryParam(Constants.KEY) String key);
 
     @GET
     @Path(Constants.GOOGLE_API_DETAILS_URL)
-    PlaceIdResponse getPlaceDetails(@HeaderParam("Authorization") String token,
+    PlaceIdResponse getPlaceDetails(@HeaderParam(Constants.AUTHORIZATION) String token,
                                     @QueryParam(Constants.PLACE_ID) String placeId,
-                                    @QueryParam("language") String language,
-                                    @QueryParam("sensor") String sensor,
-                                    @QueryParam("key") String key);
+                                    @QueryParam(Constants.HEADER_LANGUAGE) String language,
+                                    @QueryParam(Constants.HEADER_SENSOR) String sensor,
+                                    @QueryParam(Constants.KEY) String key);
 }
