@@ -77,7 +77,7 @@ public class GoogleAPiController {
 
     private void populateValuesFromVault(VaultService vaultService) {
         if(null== vaultService.getKey() || null== vaultService.getToken()) {
-            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret(vaultPath);
+            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret(VAULT_PATH);
             vaultService.setToken(vaultSecretMap.get(TOKEN));
             vaultService.setKey(vaultSecretMap.get(KEY));
         }

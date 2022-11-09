@@ -5,7 +5,7 @@ public class Constants {
     public static final String RADIUS = "150000";
     public static final String SENSOR = "false";
 
-    public static final String vaultPath = "google-api/config";
+    public static final String VAULT_PATH = "google-api/config";
     public static final String KEY = "key";
     public static final String TOKEN = "token";
     public static final String AUTHORIZATION = "Authorization";
