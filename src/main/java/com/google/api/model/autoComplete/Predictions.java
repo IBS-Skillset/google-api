@@ -6,11 +6,7 @@ import lombok.*;
 
 import java.util.List;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Predictions {
     private String description;

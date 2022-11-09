@@ -24,9 +24,10 @@ public class CacheService {
 
     public CacheService(@Value("${redis.hostName}") String redisHost,
                         @Value("${redis.port") Integer redisPort) {
-        jedisPool = new JedisPool(redisHost,redisPort);
+        jedisPool = new JedisPool(redisHost, redisPort);
     }
 
+    //can be used when deployed in another env
     private JedisPoolConfig buildPoolConfig() {
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(128);
@@ -51,7 +52,7 @@ public class CacheService {
 
     public AutoCompleteResponse autoCompleteResponseFromCache(String key) {
         try (Jedis jedis = jedisPool.getResource()) {
-            Set<String> keySet = jedis.keys(key+"*");
+            Set<String> keySet = jedis.keys(key + "*");
             if (keySet.size() >= 3) {
                 AutoCompleteResponse response = new AutoCompleteResponse();
                 List<Place> placeList = keySet.stream()
@@ -69,7 +70,7 @@ public class CacheService {
         Place place = new Place();
         place.setDescription(key);
         try (Jedis jedis = jedisPool.getResource()) {
-           place.setPlaceId(jedis.get(key));
+            place.setPlaceId(jedis.get(key));
         }
         return place;
     }
@@ -78,7 +79,7 @@ public class CacheService {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         try (Jedis jedis = jedisPool.getResource()) {
-            jedis.set("*"+placeId, mapper.writeValueAsString(placeResponse));
+            jedis.set("*" + placeId, mapper.writeValueAsString(placeResponse));
         }
     }
 
@@ -86,9 +87,9 @@ public class CacheService {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         try (Jedis jedis = jedisPool.getResource()) {
-            String cacheRes = jedis.get("*"+key);
+            String cacheRes = jedis.get("*" + key);
             if (Objects.nonNull(cacheRes)) {
-               return mapper.readValue(cacheRes,PlaceResponse.class);
+                return mapper.readValue(cacheRes, PlaceResponse.class);
             } else {
                 return null;
             }

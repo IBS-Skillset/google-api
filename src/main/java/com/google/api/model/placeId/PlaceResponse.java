@@ -5,11 +5,7 @@ import lombok.*;
 
 import java.io.Serializable;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlaceResponse implements Serializable {
 

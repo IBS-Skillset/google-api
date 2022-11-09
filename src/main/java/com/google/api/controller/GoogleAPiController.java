@@ -1,4 +1,4 @@
-package com.google.api;
+package com.google.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.api.mapper.AutoCompleteMapperService;
@@ -7,9 +7,8 @@ import com.google.api.model.autoComplete.AutoCompleteResponse;
 import com.google.api.model.autoComplete.AutoCompletionResponse;
 import com.google.api.model.placeId.PlaceIdResponse;
 import com.google.api.model.placeId.PlaceResponse;
-import com.google.api.service.AutocompleteService;
 import com.google.api.service.CacheService;
-import com.google.api.service.PlaceApiService;
+import com.google.api.service.GoogleApiRestService;
 import com.google.api.service.VaultService;
 import io.quarkus.logging.Log;
 import io.quarkus.vault.VaultKVSecretEngine;
@@ -25,7 +24,7 @@ import javax.inject.Inject;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.google.api.util.APIConstants.*;
+import static com.google.api.util.Constants.*;
 
 @RestController
 @RequestMapping("/googleApi")
@@ -33,11 +32,9 @@ public class GoogleAPiController {
 
     @Inject
     @RestClient
-    AutocompleteService autocompleteService;
+    GoogleApiRestService autocompleteService;
     @Autowired
     AutoCompleteMapperService autoCompleteMapperService;
-    @Autowired
-    PlaceApiService placeApiService;
     @Autowired
     PlaceIdMapperService placeIdMapperService;
     @Inject
@@ -45,18 +42,17 @@ public class GoogleAPiController {
     @Inject
     VaultKVSecretEngine kvSecretEngine;
 
-
     @GetMapping("/autoComplete/")
     public AutoCompleteResponse autoComplete(@RequestParam String input) throws JsonProcessingException {
         VaultService vaultService = VaultService.INSTANCE.getInstance();
         if(null==vaultService.getKey() || null==vaultService.getToken()) {
-            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret("google-api" + "/config");
-            vaultService.setToken(vaultSecretMap.get("token"));
-            vaultService.setKey(vaultSecretMap.get("key"));
+            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret(vaultPath);
+            vaultService.setToken(vaultSecretMap.get(TOKEN));
+            vaultService.setKey(vaultSecretMap.get(KEY));
         }
         AutoCompleteResponse response = cacheService.autoCompleteResponseFromCache(WordUtils.capitalize(input));
         if (Objects.isNull(response)) {
-            AutoCompletionResponse autoCompletionResponse = autocompleteService.getAutoComplete(vaultService.getToken(), input, LANGUAGE, RADIUS, SENSOR, vaultService.getKey());
+            AutoCompletionResponse autoCompletionResponse = autocompleteService.getPlaceAutoComplete(vaultService.getToken(), input, LANGUAGE, RADIUS, SENSOR, vaultService.getKey());
             response = autoCompleteMapperService.map(autoCompletionResponse);
             cacheService.cacheAutoCompleteResponse(response);
             Log.info("Google API response for autocomplete" + autoCompletionResponse);
@@ -71,7 +67,8 @@ public class GoogleAPiController {
     public PlaceResponse getLatLongByPlaceId(@RequestParam String placeId) throws JsonProcessingException {
         PlaceResponse response = cacheService.placeResponseFromCache(placeId);
         if (Objects.isNull(response)){
-            PlaceIdResponse placeIdResponse = placeApiService.getLatitudeLongitude(placeId);
+            VaultService vaultService = VaultService.INSTANCE.getInstance();
+            PlaceIdResponse placeIdResponse =   autocompleteService.getPlaceDetails(vaultService.getToken(), placeId, LANGUAGE, SENSOR, vaultService.getKey());
             response = placeIdMapperService.map(placeIdResponse);
             cacheService.cachePlaceResponse(placeId,response);
             Log.info(response);
@@ -80,5 +77,4 @@ public class GoogleAPiController {
         }
         return response;
     }
-
 }

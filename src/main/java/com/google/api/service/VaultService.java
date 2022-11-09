@@ -8,7 +8,6 @@ public enum VaultService {
     private String key;
 
     VaultService() {
-
     }
 
     public String getKey() {
