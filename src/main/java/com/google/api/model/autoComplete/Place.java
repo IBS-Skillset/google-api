@@ -1,6 +1,6 @@
 package com.google.api.model.autoComplete;
 
-import lombok.*;
+import lombok.Data;
 
 import java.io.Serializable;
 

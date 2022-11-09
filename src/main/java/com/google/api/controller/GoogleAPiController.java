@@ -45,11 +45,7 @@ public class GoogleAPiController {
     @GetMapping("/autoComplete/")
     public AutoCompleteResponse autoComplete(@RequestParam String input) throws JsonProcessingException {
         VaultService vaultService = VaultService.INSTANCE.getInstance();
-        if(null==vaultService.getKey() || null==vaultService.getToken()) {
-            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret(vaultPath);
-            vaultService.setToken(vaultSecretMap.get(TOKEN));
-            vaultService.setKey(vaultSecretMap.get(KEY));
-        }
+        populateValuesFromVault(vaultService);
         AutoCompleteResponse response = cacheService.autoCompleteResponseFromCache(WordUtils.capitalize(input));
         if (Objects.isNull(response)) {
             AutoCompletionResponse autoCompletionResponse = autocompleteService.getPlaceAutoComplete(vaultService.getToken(), input, LANGUAGE, RADIUS, SENSOR, vaultService.getKey());
@@ -68,6 +64,7 @@ public class GoogleAPiController {
         PlaceResponse response = cacheService.placeResponseFromCache(placeId);
         if (Objects.isNull(response)){
             VaultService vaultService = VaultService.INSTANCE.getInstance();
+            populateValuesFromVault(vaultService);
             PlaceIdResponse placeIdResponse =   autocompleteService.getPlaceDetails(vaultService.getToken(), placeId, LANGUAGE, SENSOR, vaultService.getKey());
             response = placeIdMapperService.map(placeIdResponse);
             cacheService.cachePlaceResponse(placeId,response);
@@ -76,5 +73,13 @@ public class GoogleAPiController {
             Log.info("From cache" + response);
         }
         return response;
+    }
+
+    private void populateValuesFromVault(VaultService vaultService) {
+        if(null== vaultService.getKey() || null== vaultService.getToken()) {
+            Map<String, String> vaultSecretMap = kvSecretEngine.readSecret(vaultPath);
+            vaultService.setToken(vaultSecretMap.get(TOKEN));
+            vaultService.setKey(vaultSecretMap.get(KEY));
+        }
     }
 }

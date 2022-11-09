@@ -1,7 +1,7 @@
 package com.google.api.model.placeId;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.Data;
 
 import java.io.Serializable;
 
