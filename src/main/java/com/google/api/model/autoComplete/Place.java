@@ -1,14 +1,10 @@
 package com.google.api.model.autoComplete;
 
-import lombok.*;
+import lombok.Data;
 
 import java.io.Serializable;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@Data
 public class Place implements Serializable {
     private String description;
     private String placeId;

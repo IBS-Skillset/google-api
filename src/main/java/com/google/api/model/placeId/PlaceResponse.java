@@ -1,15 +1,11 @@
 package com.google.api.model.placeId;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.Data;
 
 import java.io.Serializable;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlaceResponse implements Serializable {
 

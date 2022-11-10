@@ -1,13 +1,9 @@
 package com.google.api.model.placeId;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.Data;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlaceIdResponse {
     private Result result;
