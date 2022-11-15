@@ -47,10 +47,12 @@ public class GoogleAPiController {
         VaultService vaultService = VaultService.INSTANCE.getInstance();
         populateValuesFromVault(vaultService);
         AutoCompleteResponse response = cacheService.autoCompleteResponseFromCache(WordUtils.capitalize(input));
-        if (Objects.isNull(response)) {
+        if (!cacheService.isCacheStatus() || Objects.isNull(response)) {
             AutoCompletionResponse autoCompletionResponse = autocompleteService.getPlaceAutoComplete(vaultService.getToken(), input, LANGUAGE, RADIUS, SENSOR, vaultService.getKey());
             response = autoCompleteMapperService.map(autoCompletionResponse);
-            cacheService.cacheAutoCompleteResponse(response);
+            if (cacheService.isCacheStatus()) {
+                cacheService.cacheAutoCompleteResponse(response);
+            }
             Log.info("Google API response for autocomplete" + autoCompletionResponse);
             Log.info(response);
         } else {
@@ -62,12 +64,14 @@ public class GoogleAPiController {
     @GetMapping("/placeId/")
     public PlaceResponse getLatLongByPlaceId(@RequestParam String placeId) throws JsonProcessingException {
         PlaceResponse response = cacheService.placeResponseFromCache(placeId);
-        if (Objects.isNull(response)){
+        if (!cacheService.isCacheStatus() || Objects.isNull(response)){
             VaultService vaultService = VaultService.INSTANCE.getInstance();
             populateValuesFromVault(vaultService);
             PlaceIdResponse placeIdResponse =   autocompleteService.getPlaceDetails(vaultService.getToken(), placeId, LANGUAGE, SENSOR, vaultService.getKey());
             response = placeIdMapperService.map(placeIdResponse);
-            cacheService.cachePlaceResponse(placeId,response);
+            if (cacheService.isCacheStatus()) {
+                cacheService.cachePlaceResponse(placeId, response);
+            }
             Log.info(response);
         } else {
             Log.info("From cache" + response);
