@@ -1,7 +1,0 @@
-quarkus:
-  spring-cloud-config:
-    enabled: true
-    url: http://localhost:9296/config-server
-    name: quarkus-serviceregistry-dev
-  application:
-    name: google-api
