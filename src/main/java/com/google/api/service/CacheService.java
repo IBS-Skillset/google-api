@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.api.model.autoComplete.AutoCompleteResponse;
 import com.google.api.model.autoComplete.Place;
 import com.google.api.model.placeId.PlaceResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -18,9 +20,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
+@Slf4j
 public class CacheService {
 
     private static JedisPool jedisPool = null;
+    private boolean cacheStatus = true;
+    public boolean isCacheStatus() {
+        return cacheStatus;
+    }
+
+
 
     public CacheService(@Value("${redis.hostName}") String redisHost,
                         @Value("${redis.port") Integer redisPort) {
@@ -52,6 +61,7 @@ public class CacheService {
 
     public AutoCompleteResponse autoCompleteResponseFromCache(String key) {
         try (Jedis jedis = jedisPool.getResource()) {
+            cacheStatus = true;
             Set<String> keySet = jedis.keys(key + "*");
             if (keySet.size() >= 3) {
                 AutoCompleteResponse response = new AutoCompleteResponse();
@@ -63,7 +73,11 @@ public class CacheService {
             } else {
                 return null;
             }
+        } catch (JedisConnectionException e) {
+           log.error("Jedis connection failed" + e.getMessage());
+           cacheStatus = false;
         }
+        return null;
     }
 
     private Place mapPlace(String key) {
@@ -87,12 +101,17 @@ public class CacheService {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         try (Jedis jedis = jedisPool.getResource()) {
+            cacheStatus = true;
             String cacheRes = jedis.get("*" + key);
             if (Objects.nonNull(cacheRes)) {
                 return mapper.readValue(cacheRes, PlaceResponse.class);
             } else {
                 return null;
             }
+        } catch (JedisConnectionException e) {
+            log.error("Jedis connection failed" + e.getMessage());
+            cacheStatus = false;
         }
+        return null;
     }
 }
