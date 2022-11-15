@@ -1,4 +1,4 @@
-package com.google.api;
+package com.google.api.controller;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,15 @@ public class GoogleAPiControllerTest {
     public void testExtensionsIdEndpoint() {
         given()
                 .when().get("/googleApi/autoComplete?input=ABC")
+                .then()
+                .statusCode(200);
+
+    }
+
+    @Test
+    public void testPlaceIdEndpoint() {
+        given()
+                .when().get("/googleApi/placeId?placeId=ChIJ9WBuGRRw5kcRMBuUaMOCCwU")
                 .then()
                 .statusCode(200);
 

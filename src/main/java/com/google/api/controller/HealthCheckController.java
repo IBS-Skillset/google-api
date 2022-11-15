@@ -1,4 +1,4 @@
-package com.google.api.health;
+package com.google.api.controller;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
