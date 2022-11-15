@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.times;
 
 public class CacheServiceTest {
 
@@ -55,7 +55,7 @@ public class CacheServiceTest {
         autoCompleteResponse.setPlace(placeList);
         doNothing().when(cacheServiceMock).cacheAutoCompleteResponse(autoCompleteResponse);
         cacheServiceMock.cacheAutoCompleteResponse(autoCompleteResponse);
-        verify(cacheServiceMock,atLeast(1)).cacheAutoCompleteResponse(autoCompleteResponse);
+        verify(cacheServiceMock,times(1)).cacheAutoCompleteResponse(autoCompleteResponse);
     }
 
     @Test
@@ -66,6 +66,6 @@ public class CacheServiceTest {
         placeResponse.setLongitude("3.4565");
         doNothing().when(cacheServiceMock).cachePlaceResponse("dd2321srrty",placeResponse);
         cacheServiceMock.cachePlaceResponse("dd2321srrty",placeResponse);
-        verify(cacheServiceMock,atLeast(1)).cachePlaceResponse("dd2321srrty",placeResponse);
+        verify(cacheServiceMock,times(1)).cachePlaceResponse("dd2321srrty",placeResponse);
     }
 }
