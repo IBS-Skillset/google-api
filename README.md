@@ -66,3 +66,15 @@ Invoke different services through REST with JSON
 Spring, the Quarkus way! Start your RESTful Web Services with a Spring Controller.
 
 [Related guide section...](https://quarkus.io/guides/spring-web#greetingcontroller)
+
+Docker commands to run in local
+-----------------------------
+
+docker build -t google-api:0.0.1-SNAPSHOT .
+
+docker run -p 8081:8081 --network host -e eureka.service-url.default=http://172.17.0.2:8761/eureka/ -e quarkus.spring-cloud-config.url=http://172.17.0.4:9296/config-server -e vault.url=http://127.0.0.1:8200 --name google-api google-api:0.0.1-SNAPSHOT
+
+Replace the ip in the http://172.17.0.2:8761/eureka/ url with the container ip of service-registry
+To find the container ip run the following command
+
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' service-registry
