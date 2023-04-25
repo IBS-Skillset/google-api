@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: google-api
+  namespace: beta-app
+  labels:
+    app.kubernetes.io/name: google-api
+spec:
+  replicas: 1
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: google-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: google-api
+    spec:
+      containers:
+        - name: google-api
+          image: 306472407007.dkr.ecr.ap-south-1.amazonaws.com/ibs-skillset-happystays/google-api:d64692d
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8081
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "200m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+          env:
+            - name: HOST_CONFIG
+              value: config-server
+            - name: HOST_REGISTRY
+              value: service-registry
