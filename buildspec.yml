@@ -20,7 +20,6 @@ phases:
     commands:
       - echo Maven build
       - mvn install -DskipTests
-      - echo Build started on `date`
       - echo Building the Docker image...
       - echo $REPOSITORY_URI
       - docker build -t $REPOSITORY_URI:latest .
