@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: google-api
-          image: 306472407007.dkr.ecr.ap-south-1.amazonaws.com/ibs-skillset-happystays/google-api:d64692d
+          image: 306472407007.dkr.ecr.ap-south-1.amazonaws.com/ibs-skillset-happystays/google-api:a25b7b5
           imagePullPolicy: Always
           ports:
             - name: http
